@@ -1,16 +1,21 @@
 #include <stdio.h>
 #include <string.h>
 #include "administration.c"
+#include "wordextract.c"
 
 
 int main() {
 //variables declaration
+    const char* file_path = "words.txt";
+    int num_words;
+    struct WordInfo* words = readTextFileToTable(file_path, &num_words);
     struct Level levels[MAX_LEVELS];
     int levelCount = 0;
-    char c[] = "hello";// predifined word
-    int test[]={0,0,0,0,0};// Array to store the scoring
-    char word[6];// Player's guess
-    int used[]={0,0,0,0,0};// Array to track already matched characters
+    char *c;// predifined word
+    int *test;// Array to store the scoring
+    char *word;// Player's guess
+    int *used;// Array to track already matched characters
+    int advance;
     //int confirm;
     //welcome screen
  printf("   _____   _______________________ ___  _________\n");
@@ -28,21 +33,48 @@ int main() {
     if (userRole == 1) {
         // Player's code
         printf("Welcome, player!\n");
+         for(int k = 0 ; k<num_words;k++){
+            c = (char*)malloc(words[k].length*sizeof(char));
+            word =(char*)malloc(words[k].length*sizeof(char));
+            c=words[k].word;
+            printf("%s",c);
    do{
+
     
-//ask the user to enter a word
-do{
-        int test[] = {0, 0, 0, 0, 0}; // Array to store the scoring
-        int used[] = {0, 0, 0, 0, 0}; // Array to track already matched characters
-  printf("[+] Enter your guess for the word (5 letters):");
-    scanf("%s",&word);
-}while(strlen(word)!=5);
+
+
+int* test;
+int *used;
+        test = (int*)malloc(words[k].length*sizeof(int));
+        used = (int*)malloc(words[k].length*sizeof(int));
+        
+       
+        for(int a = 0; a<words[k].length;a++){
+            *(test+a) = 0;
+            *(used+a) = 0;
+        }
+      //  int test[] = {0, 0, 0, 0, 0}; // Array to store the scoring
+        //int used[] = {0, 0, 0, 0, 0}; // Array to track already matched characters
+         
+          
+          //ask the user to enter a word
+          do {
+    printf("[+] Enter your guess for the word (%d letters): ", words[k].length);
+    scanf("%s", word);
+
+    if (strlen(word) == words[k].length) {
+        break; 
+        // Go back to the beginning of the loop
+    }
+        printf("Word length does not match. Please enter a word with %d letters.\n", words[k].length);
+
+    // The rest of your code for checking the guess and updating the game logic
+} while (1);
    
     // test the similiarity and if the characters are there
-    for(int i = 0; i<5;i++){
+    for(int i = 0; i<words[k].length;i++){
       if(word[i]==c[i]){
-        printf(" word of i is %c",word[i]);
-      printf(" \n%c  and %c \n",word[i],c[i]);
+        
         test[i]=1;
         used[i]=1;
       }
@@ -50,9 +82,9 @@ do{
     for(int i = 0; i<5;i++){
       printf("\n %d \t \n",used[i]);
     }
-     for (int i = 0; i < 5; i++) {
+     for (int i = 0; i < words[k].length; i++) {
         if (test[i] == 0) { // Only check characters not marked as '1'
-            for (int j = 0; j < 5; j++) {
+            for (int j = 0; j <words[k].length; j++) {
                 if (used[j] == 0 && word[i] == c[j]) {
                     test[i] = 2;
                     used[j] = 1; // Mark the character as used
@@ -65,26 +97,33 @@ do{
       
 //printf("\nFinish\n");
 printf("\n");
-    for (int i = 0;i<5; i++) {
+    for (int i = 0;i<words[k].length; i++) {
         printf("%d",test[i]);
     }
 printf("\n");
 int all_correct = 1; // Assume all elements are correct
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < words[k].length; i++) {
             if (test[i] != 1) {
                 all_correct = 0; // Not all elements are correct
                 break;
+                
             }
         }
 
         // Check if the win condition is met
         if (all_correct) {
-            printf("Congratulations! You guessed the word.\n");
+            if(k==num_words-1){
+                break;
+            }
+            printf("Congratulations! You guessed the word. Do you want to continue?\n");
+            scanf("%d",&advance);
+            if(advance==0)goto end;
+            
             break;
         }
 
- }while (1);
-    }
+         }while (1);
+         }}
     else if (userRole == 2) {
         printf("Enter the super user secret code: ");
         char secretCode[20]; // Adjust the size as needed
@@ -140,6 +179,7 @@ int all_correct = 1; // Assume all elements are correct
     } else {
         printf("Invalid role. Please choose 1 for player or 2 for super user.\n");
     }
+    end:printf("THANK YOU FOR PLAYING");
  return 0;
 
 
