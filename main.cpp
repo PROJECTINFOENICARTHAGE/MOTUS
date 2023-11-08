@@ -2,15 +2,19 @@
 #include <string.h>
 #include "administration.c"
 #include "wordextract.c"
+#include "changeColors.c"
 
 
 int main() {
 //variables declaration
-    const char* file_path = "words.txt";
-    int num_words;
-    struct WordInfo* words = readTextFileToTable(file_path, &num_words);
+    const char* filename = "data.txt";
+    int targetLevel = 1;
+    int wordCount;
+    int totalWordCount;
+    int levelCount;
+    WordInfo* wordInfos = getWordsForLevel(filename, targetLevel, &wordCount, &totalWordCount, &levelCount);
+    char* formattedWord ;
     struct Level levels[MAX_LEVELS];
-    int levelCount = 0;
     char *c;// predifined word
     int *test;// Array to store the scoring
     char *word;// Player's guess
@@ -18,6 +22,7 @@ int main() {
     int advance;
     //int confirm;
     //welcome screen
+    menuMain:;
  printf("   _____   _______________________ ___  _________\n");
     printf("  /     \\  \\_____  \\__    ___/    |   \\/   _____/\n");
     printf(" /  \\ /  \\  /   |   \\|    |  |    |   /\\_____  \\\n");
@@ -33,10 +38,13 @@ int main() {
     if (userRole == 1) {
         // Player's code
         printf("Welcome, player!\n");
-         for(int k = 0 ; k<num_words;k++){
-            c = (char*)malloc(words[k].length*sizeof(char));
-            word =(char*)malloc(words[k].length*sizeof(char));
-            c=words[k].word;
+         for(int k = 1 ; k<levelCount;k++){
+            wordInfos = getWordsForLevel(filename, k, &wordCount, &totalWordCount, &levelCount);
+            for(int w=0;w<wordCount;w++){
+
+            c = (char*)malloc(wordInfos[w].length*sizeof(char));
+            word =(char*)malloc(wordInfos[w].length*sizeof(char));
+            c=wordInfos[w].word;
             printf("%s",c);
    do{
 
@@ -45,11 +53,11 @@ int main() {
 
 int* test;
 int *used;
-        test = (int*)malloc(words[k].length*sizeof(int));
-        used = (int*)malloc(words[k].length*sizeof(int));
+        test = (int*)malloc(wordInfos[w].length*sizeof(int));
+        used = (int*)malloc(wordInfos[w].length*sizeof(int));
         
        
-        for(int a = 0; a<words[k].length;a++){
+        for(int a = 0; a<wordInfos[w].length;a++){
             *(test+a) = 0;
             *(used+a) = 0;
         }
@@ -59,32 +67,32 @@ int *used;
           
           //ask the user to enter a word
           do {
-    printf("[+] Enter your guess for the word (%d letters): ", words[k].length);
+    printf("[+] Enter your guess for the word (%d letters): ", wordInfos[w].length);
     scanf("%s", word);
 
-    if (strlen(word) == words[k].length) {
+    if (strlen(word) == wordInfos[w].length) {
         break; 
         // Go back to the beginning of the loop
     }
-        printf("Word length does not match. Please enter a word with %d letters.\n", words[k].length);
+        printf("Word length does not match. Please enter a word with %d letters.\n", wordInfos[w].length);
 
     // The rest of your code for checking the guess and updating the game logic
 } while (1);
    
     // test the similiarity and if the characters are there
-    for(int i = 0; i<words[k].length;i++){
+    for(int i = 0; i<wordInfos[w].length;i++){
       if(word[i]==c[i]){
         
         test[i]=1;
         used[i]=1;
       }
     }
-    for(int i = 0; i<5;i++){
-      printf("\n %d \t \n",used[i]);
-    }
-     for (int i = 0; i < words[k].length; i++) {
+   // for(int i = 0; i<5;i++){
+     // printf("\n %d \t \n",used[i]);
+    //}
+     for (int i = 0; i < wordInfos[w].length; i++) {
         if (test[i] == 0) { // Only check characters not marked as '1'
-            for (int j = 0; j <words[k].length; j++) {
+            for (int j = 0; j <wordInfos[w].length; j++) {
                 if (used[j] == 0 && word[i] == c[j]) {
                     test[i] = 2;
                     used[j] = 1; // Mark the character as used
@@ -97,12 +105,16 @@ int *used;
       
 //printf("\nFinish\n");
 printf("\n");
-    for (int i = 0;i<words[k].length; i++) {
+char* formattedWord = formatWordWithColors(word, test, wordInfos[w].length);
+printf("%s%s\n", formattedWord, RESET);
+printf("%s",WHITE);
+
+    /*for (int i = 0;i<wordInfos[w].length; i++) {
         printf("%d",test[i]);
-    }
+    }*/
 printf("\n");
 int all_correct = 1; // Assume all elements are correct
-        for (int i = 0; i < words[k].length; i++) {
+        for (int i = 0; i < wordInfos[w].length; i++) {
             if (test[i] != 1) {
                 all_correct = 0; // Not all elements are correct
                 break;
@@ -112,7 +124,9 @@ int all_correct = 1; // Assume all elements are correct
 
         // Check if the win condition is met
         if (all_correct) {
-            if(k==num_words-1){
+            printf("%d",wordCount);
+            printf("target level :%d",targetLevel);
+            if(w==wordCount){
                 break;
             }
             printf("Congratulations! You guessed the word. Do you want to continue?\n");
@@ -123,7 +137,13 @@ int all_correct = 1; // Assume all elements are correct
         }
 
          }while (1);
-         }}
+         }
+    }
+         
+         
+         
+         
+         }
     else if (userRole == 2) {
         printf("Enter the super user secret code: ");
         char secretCode[20]; // Adjust the size as needed
@@ -133,6 +153,7 @@ int all_correct = 1; // Assume all elements are correct
         if (strcmp(secretCode, "superuser123") == 0) {
             printf("Welcome, super user!\n");
              loadData("data.txt", levels, &levelCount);
+             printf("in");
 
     while (1) {
         int choice;
@@ -168,7 +189,8 @@ int all_correct = 1; // Assume all elements are correct
                 printf("Data saved to file.\n");
                 break;
             case 7:
-                return 0;
+            goto menuMain;
+               // return 0;
             default:
                 printf("Invalid choice. Please try again.\n");
         }
