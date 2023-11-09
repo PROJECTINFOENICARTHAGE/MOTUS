@@ -12,6 +12,37 @@ struct Level {
     char words[MAX_WORDS][MAX_WORD_LENGTH];
     int wordCount;
 };
+int checkMinimumLevels(int levelCount) {
+    if (levelCount!=3 ) {
+        printf("Cannot proceed. Minimum of 1 levels or maximum of 3 are required.\n");
+        return 0;
+    }
+    return 1;
+}
+// Function to check if a level has at least 5 words
+int checkMinimumWords(struct Level* level) {
+    if (level->wordCount !=3) {
+        printf("Level %d must have at least 2 words and max 3 words. Please add or delete words.\n", level->level);
+        return 0;
+    }
+    return 1;
+}
+
+int existLevel(struct Level levels[], int levelCount) {
+    // Check if each level has at least 5 words
+    if(!checkMinimumLevels(levelCount)){
+        printf("Cannot proceed. Minimum 5 levels are required.\n");
+        return 0;
+    }
+
+    for (int i = 0; i < levelCount; i++) {
+        if (!checkMinimumWords(&levels[i])) {
+            printf("Cannot proceed. Minimum 5 words are required in each level.\n");
+            return 0;
+        }
+    }
+    return 1;
+}
 
 // Function to save data to a text file
 void saveData(const char* filename, struct Level levels[], int levelCount) {
@@ -28,13 +59,14 @@ void saveData(const char* filename, struct Level levels[], int levelCount) {
         fprintf(file, "      \"words\": [\n");
 
         for (int j = 0; j < levels[i].wordCount; j++) {
-            fprintf(file, "        \"%s\"", levels[i].words[j]);
+            fprintf(file, "        %s", levels[i].words[j]); // Removed the double quotes here
             if (j < levels[i].wordCount - 1) {
-                fprintf(file, ", ");
+                fprintf(file, ",");
             }
+            fprintf(file, "\n");
         }
 
-        fprintf(file, "\n      ]\n");
+        fprintf(file, "      ]\n");
 
         fprintf(file, "    }");
         if (i < levelCount - 1) {
@@ -210,7 +242,7 @@ void changeWordInLevel(struct Level levels[], int levelCount) {
     }
 }
 
-// Function to delete a level
+
 // Function to delete a level
 void deleteLevel(struct Level levels[], int* levelCount) {
     if (*levelCount == 0) {
@@ -235,5 +267,3 @@ void deleteLevel(struct Level levels[], int* levelCount) {
     }
     (*levelCount)--;
 }
-
-

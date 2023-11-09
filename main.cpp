@@ -20,6 +20,7 @@ int main() {
     char *word;// Player's guess
     int *used;// Array to track already matched characters
     int advance;
+    int adminExsit;
     //int confirm;
     //welcome screen
     menuMain:;
@@ -189,8 +190,11 @@ int all_correct = 1; // Assume all elements are correct
                 printf("Data saved to file.\n");
                 break;
             case 7:
-            goto menuMain;
-               // return 0;
+            adminExsit = existLevel(levels, levelCount);
+            if(adminExsit==0) break;
+             goto menuMain ;
+            
+               
             default:
                 printf("Invalid choice. Please try again.\n");
         }
