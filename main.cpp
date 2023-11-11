@@ -21,6 +21,9 @@ int main() {
     int *used;// Array to track already matched characters
     int advance;
     int adminExsit;
+    int initialScore=5;
+    int playerScore=0;
+    int skip=1;
     //int confirm;
     //welcome screen
     menuMain:;
@@ -42,6 +45,7 @@ int main() {
          for(int k = 1 ; k<levelCount;k++){
             wordInfos = getWordsForLevel(filename, k, &wordCount, &totalWordCount, &levelCount);
             for(int w=0;w<wordCount;w++){
+            initialScore=5;
 
             c = (char*)malloc(wordInfos[w].length*sizeof(char));
             word =(char*)malloc(wordInfos[w].length*sizeof(char));
@@ -118,6 +122,11 @@ int all_correct = 1; // Assume all elements are correct
         for (int i = 0; i < wordInfos[w].length; i++) {
             if (test[i] != 1) {
                 all_correct = 0; // Not all elements are correct
+                if(initialScore==1){
+                initialScore=0;
+                goto nextWord;
+                }
+                initialScore-=1;
                 break;
                 
             }
@@ -127,10 +136,17 @@ int all_correct = 1; // Assume all elements are correct
         if (all_correct) {
             printf("%d",wordCount);
             printf("target level :%d",targetLevel);
+            playerScore+=initialScore;
+            
+            nextWord:;
+            
             if(w==wordCount){
+                printf("playerScore: %d",playerScore);
                 break;
             }
+
             printf("Congratulations! You guessed the word. Do you want to continue?\n");
+            printf("playerScore: %d",playerScore);
             scanf("%d",&advance);
             if(advance==0)goto end;
             
