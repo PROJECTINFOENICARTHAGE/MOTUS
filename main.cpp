@@ -45,6 +45,7 @@ int main() {
          for(int k = 1 ; k<levelCount;k++){
             wordInfos = getWordsForLevel(filename, k, &wordCount, &totalWordCount, &levelCount);
             for(int w=0;w<wordCount;w++){
+            //printf("word count : %d",wordCount);
             initialScore=5;
 
             c = (char*)malloc(wordInfos[w].length*sizeof(char));
@@ -134,21 +135,32 @@ int all_correct = 1; // Assume all elements are correct
 
         // Check if the win condition is met
         if (all_correct) {
-            printf("%d",wordCount);
-            printf("target level :%d",targetLevel);
+            //printf("%d",wordCount);
+           // printf("target level :%d",targetLevel);
             playerScore+=initialScore;
             
             nextWord:;
+
+            printf("%d playersore \n",playerScore);
+            //printf("%d  w= %d \n",w==4 && playerScore/19 <1,w);
+            if(w==wordCount-1 && playerScore/19 <1){printf("game over ");printf("playerScore: %d",playerScore); goto end;}
+            else printf("Congratulations! passed level %d\n",k);
+            if(w==wordCount-1 && k==levelCount-1){
+                printf("Congratulations! you won. Your score is : %d\n",playerScore);
+            }
+
             
             if(w==wordCount){
                 printf("playerScore: %d",playerScore);
                 break;
             }
+            
+            
 
-            printf("Congratulations! You guessed the word. Do you want to continue?\n");
-            printf("playerScore: %d",playerScore);
-            scanf("%d",&advance);
-            if(advance==0)goto end;
+            //printf("Congratulations! You guessed the word. Do you want to continue?\n");
+            //printf("playerScore: %d",playerScore);
+            //scanf("%d",&advance);
+            //if(advance==0)goto end;
             
             break;
         }
