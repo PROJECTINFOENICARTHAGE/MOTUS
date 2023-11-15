@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_LEVELS 5
-#define MAX_WORDS 5
+#define MAX_LEVELS 3
+#define MAX_WORDS 3
 #define MAX_WORD_LENGTH 20
 
 // Structure to store the data
@@ -13,15 +13,15 @@ struct Level {
     int wordCount;
 };
 int checkMinimumLevels(int levelCount) {
-    if (levelCount!=3 ) {
-        printf("Cannot proceed. Minimum of 1 levels or maximum of 3 are required.\n");
+    if (levelCount!=MAX_LEVELS ) {
+        printf("Cannot proceed. Minimum of 1 levels or maximum of 3 are required. %d\n",levelCount);
         return 0;
     }
     return 1;
 }
 // Function to check if a level has at least 5 words
 int checkMinimumWords(struct Level* level) {
-    if (level->wordCount !=3) {
+    if (level->wordCount !=MAX_WORDS) {
         printf("Level %d must have at least 2 words and max 3 words. Please add or delete words.\n", level->level);
         return 0;
     }
@@ -31,7 +31,7 @@ int checkMinimumWords(struct Level* level) {
 int existLevel(struct Level levels[], int levelCount) {
     // Check if each level has at least 5 words
     if(!checkMinimumLevels(levelCount)){
-        printf("Cannot proceed. Minimum 5 levels are required.\n");
+        printf("Cannot proceed. Minimum 3 levels are required.\n");
         return 0;
     }
 
@@ -44,7 +44,6 @@ int existLevel(struct Level levels[], int levelCount) {
     return 1;
 }
 
-// Function to save data to a text file
 void saveData(const char* filename, struct Level levels[], int levelCount) {
     FILE* file = fopen(filename, "w");
     if (file == NULL) {
@@ -52,34 +51,22 @@ void saveData(const char* filename, struct Level levels[], int levelCount) {
         return;
     }
 
-    fprintf(file, "{\n  \"levels\": [\n");
     for (int i = 0; i < levelCount; i++) {
-        fprintf(file, "    {\n");
-        fprintf(file, "      \"level\": %d,\n", levels[i].level);
-        fprintf(file, "      \"words\": [\n");
+        fprintf(file, "level %d :[", levels[i].level);
 
         for (int j = 0; j < levels[i].wordCount; j++) {
-            fprintf(file, "        %s", levels[i].words[j]); // Removed the double quotes here
+            fprintf(file, "%s", levels[i].words[j]);
             if (j < levels[i].wordCount - 1) {
                 fprintf(file, ",");
             }
-            fprintf(file, "\n");
         }
 
-        fprintf(file, "      ]\n");
-
-        fprintf(file, "    }");
-        if (i < levelCount - 1) {
-            fprintf(file, ",");
-        }
-        fprintf(file, "\n");
+        fprintf(file, "]\n");
     }
 
-    fprintf(file, "  ]\n}");
     fclose(file);
 }
 
-// Function to load data from a text file
 void loadData(const char* filename, struct Level levels[], int* levelCount) {
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
@@ -88,35 +75,45 @@ void loadData(const char* filename, struct Level levels[], int* levelCount) {
         return;
     }
 
-    char buffer[1024];
-    int insideWords = 0;
+    *levelCount = 0;
+
+    char buffer[2048];
+
     while (fgets(buffer, sizeof(buffer), file) != NULL) {
-        if (strstr(buffer, "\"levels\": [") != NULL) {
-            insideWords = 1;
-        } else if (insideWords) {
-            if (strstr(buffer, "\"level\":") != NULL) {
-                sscanf(buffer, "      \"level\": %d,", &levels[*levelCount].level);
-            } else if (strstr(buffer, "\"words\": [") != NULL) {
-                insideWords = 1;
-                levels[*levelCount].wordCount = 0;
-            } else if (strstr(buffer, "]") != NULL) {
-                (*levelCount)++;
-                insideWords = 0;
-            } else if (insideWords) {
-                sscanf(buffer, "        \"%[^\"]\",", levels[*levelCount].words[levels[*levelCount].wordCount]);
-                levels[*levelCount].wordCount++;
+        int level;
+        char words[MAX_WORDS][MAX_WORD_LENGTH];
+
+        if (sscanf(buffer, "level %d :[ %[^]]", &level, words[0]) == 2) {
+            struct Level newLevel;
+            newLevel.level = level;
+            newLevel.wordCount = 0;
+
+            // Tokenize the words
+            char* token = strtok(words[0], ",");
+            while (token != NULL && newLevel.wordCount < MAX_WORDS) {
+                strcpy(newLevel.words[newLevel.wordCount], token);
+                newLevel.wordCount++;
+                token = strtok(NULL, ",");
             }
+
+            levels[*levelCount] = newLevel;
+            (*levelCount)++;
         }
     }
 
     fclose(file);
 }
-// Function to create a new level
+
 void createLevel(struct Level levels[], int* levelCount) {
     if (*levelCount < MAX_LEVELS) {
         struct Level newLevel;
         newLevel.level = *levelCount + 1;
         newLevel.wordCount = 0;
+
+        // Initialize the words array to empty strings
+        for (int i = 0; i < MAX_WORDS; i++) {
+            strcpy(newLevel.words[i], "");
+        }
 
         levels[*levelCount] = newLevel;
         (*levelCount)++;
@@ -124,7 +121,6 @@ void createLevel(struct Level levels[], int* levelCount) {
         printf("Maximum number of levels reached. Cannot create a new level.\n");
     }
 }
-
 // Function to add a word to a specific level after checking if it exists
 void addWordToLevel(struct Level levels[], int levelCount) {
     if (levelCount == 0) {
@@ -243,7 +239,6 @@ void changeWordInLevel(struct Level levels[], int levelCount) {
 }
 
 
-// Function to delete a level
 void deleteLevel(struct Level levels[], int* levelCount) {
     if (*levelCount == 0) {
         printf("No levels exist. Please create a level first.\n");
@@ -265,5 +260,12 @@ void deleteLevel(struct Level levels[], int* levelCount) {
     for (int i = selectedLevel - 1; i < *levelCount - 1; i++) {
         levels[i] = levels[i + 1];
     }
+
     (*levelCount)--;
+    // Adjust the level numbers after the deletion
+    for (int i = 0; i < *levelCount; i++) {
+        levels[i].level = i + 1;
+    }
 }
+
+

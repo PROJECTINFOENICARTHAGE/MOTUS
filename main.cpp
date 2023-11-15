@@ -3,11 +3,12 @@
 #include "administration.c"
 #include "wordextract.c"
 #include "changeColors.c"
-
+#include "automaticGenration.c"
 
 int main() {
 //variables declaration
     const char* filename = "data.txt";
+    //modifyAndOverwriteFile();
     int targetLevel = 1;
     int wordCount;
     int totalWordCount;
@@ -23,6 +24,7 @@ int main() {
     int adminExsit;
     int initialScore=5;
     int playerScore=0;
+    int totalScore=0;
     int skip=1;
     //int confirm;
     //welcome screen
@@ -42,6 +44,7 @@ int main() {
     if (userRole == 1) {
         // Player's code
         printf("Welcome, player!\n");
+        printf("%s this is the word",wordInfos[1].word);
          for(int k = 1 ; k<levelCount;k++){
             wordInfos = getWordsForLevel(filename, k, &wordCount, &totalWordCount, &levelCount);
             for(int w=0;w<wordCount;w++){
@@ -143,10 +146,11 @@ int all_correct = 1; // Assume all elements are correct
 
             printf("%d playersore \n",playerScore);
             //printf("%d  w= %d \n",w==4 && playerScore/19 <1,w);
+            printf("wordcount %d",w==wordCount-1 && playerScore/19 <1);
             if(w==wordCount-1 && playerScore/19 <1){printf("game over ");printf("playerScore: %d",playerScore); goto end;}
-            else printf("Congratulations! passed level %d\n",k);
+            else if(w==wordCount-1 && playerScore/19 >=1) {printf("Congratulations! passed level %d\n",k); totalScore= playerScore;playerScore=0;}
             if(w==wordCount-1 && k==levelCount-1){
-                printf("Congratulations! you won. Your score is : %d\n",playerScore);
+                printf("Congratulations! you won. Your score is : %d\n",totalScore);
             }
 
             
@@ -182,7 +186,6 @@ int all_correct = 1; // Assume all elements are correct
         if (strcmp(secretCode, "superuser123") == 0) {
             printf("Welcome, super user!\n");
              loadData("data.txt", levels, &levelCount);
-             printf("in");
 
     while (1) {
         int choice;
