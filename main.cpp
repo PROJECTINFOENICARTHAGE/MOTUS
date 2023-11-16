@@ -26,6 +26,7 @@ int main() {
     int playerScore=0;
     int totalScore=0;
     int skip=1;
+    int hint;
     //int confirm;
     //welcome screen
     menuMain:;
@@ -41,13 +42,15 @@ int main() {
     int userRole;
     scanf("%d", &userRole);
 
-    if (userRole == 1) {
+    if (userRole == 2) {
+        playermode:;
         // Player's code
         printf("Welcome, player!\n");
         //printf("%s this is the word",wordInfos[1].word);
          for(int k = 1 ; k<levelCount;k++){
             wordInfos = getWordsForLevel(filename, k, &wordCount, &totalWordCount, &levelCount);
             for(int w=0;w<wordCount;w++){
+            
             //printf("word count : %d",wordCount);
             initialScore=5;
 
@@ -56,6 +59,7 @@ int main() {
             c=wordInfos[w].word;
            // printf("%s",c);
    do{
+    
 
     
 
@@ -72,8 +76,29 @@ int *used;
         }
       //  int test[] = {0, 0, 0, 0, 0}; // Array to store the scoring
         //int used[] = {0, 0, 0, 0, 0}; // Array to track already matched characters
-         
-          
+        while (1) {
+        printf("Do you want a hint for the first character? [1: yes / 0: no]: ");
+        scanf("%d", &hint);
+
+        if (hint == 0 || hint == 1) {
+            break;
+        } else {
+            printf("Invalid input. Please enter either 1 or 0.\n");
+        }
+    }
+         /* do {
+        printf("Do you want a hint for the first character? [1: yes / 0: no]: ");
+        scanf("%d", &hint);
+
+        if (hint != 0 && hint != 1) {
+            printf("Invalid input. Please enter either 1 or 0.\n");
+        }
+        
+
+    } while (hint != 0 && hint != 1);*/
+            if(hint==1){
+                printf("\n hint : %c \n",c[0]);
+            }
           //ask the user to enter a word
           do {
     printf("[+] Enter your guess for the word (%d letters): ", wordInfos[w].length);
@@ -187,7 +212,7 @@ int all_correct = 1; // Assume all elements are correct
          
          
          }
-    else if (userRole == 2) {
+    else if (userRole == 1) {
         printf("Enter the super user secret code: ");
         char secretCode[20]; // Adjust the size as needed
         scanf("%s", secretCode);
@@ -198,6 +223,7 @@ int all_correct = 1; // Assume all elements are correct
              loadData("data.txt", levels, &levelCount);
 
     while (1) {
+        repet:;
         int choice;
         printf("Options:\n");
         printf("1. Create a new level\n");
@@ -206,7 +232,8 @@ int all_correct = 1; // Assume all elements are correct
         printf("4. Change word in a level\n");
         printf("5. Delete a level\n");
         printf("6. Save data to file\n");
-        printf("7. Exit\n");
+        printf("7. Play\n");
+        printf("8. Exit\n");
         printf("Enter your choice: ");
         scanf("%d", &choice);
 
@@ -231,10 +258,20 @@ int all_correct = 1; // Assume all elements are correct
                 printf("Data saved to file.\n");
                 break;
             case 7:
+            if(adminExsit!=0){ goto playermode;}
+            else{
+               printf("can't play not enough levels");
+            }
+            goto repet ;
+            case 8:
             adminExsit = existLevel(levels, levelCount);
             if(adminExsit==0) break;
              goto menuMain ;
             
+
+            
+
+
                
             default:
                 printf("Invalid choice. Please try again.\n");
@@ -243,7 +280,12 @@ int all_correct = 1; // Assume all elements are correct
         } else {
             printf("Invalid secret code. Access denied.\n");
         }
-    } else {
+    
+    }
+    else if (userRole =3){
+
+    }
+     else {
         printf("Invalid role. Please choose 1 for player or 2 for super user.\n");
     }
     end:printf("THANK YOU FOR PLAYING");
