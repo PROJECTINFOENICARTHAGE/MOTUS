@@ -4,7 +4,7 @@
 #include <ctype.h>
 
 #define MAX_LEVELS 3
-#define MAX_WORDS 3
+#define MAX_WORDS 5
 #define MAX_WORD_LENGTH 20
 #define MAX_LINE_LENGTH 1000
 
@@ -212,6 +212,208 @@ printf("\n Enter the old word: ");
    
     found =0;
 }
+// Function to change a word in a specific level
+/*void changeWordInLevelAndUpdateFile(const char* filename, struct Level levels[], int levelCount) {
+    FILE* inputFile, *tempFile;
+    inputFile = fopen(filename, "r");
+    tempFile = fopen("temp.txt", "w+");
+
+    if (inputFile == NULL || tempFile == NULL) {
+        perror("Error opening file");
+        exit(1);
+    }
+
+    int selectedLevel;
+
+    printf("Choose a level to change a word in (1-3): ");
+    scanf("%d", &selectedLevel);
+
+    if (selectedLevel < 1 || selectedLevel > 3) {
+        printf("Invalid level number.\n");
+        exit(1);
+    }
+
+    struct Level* level = &levels[selectedLevel - 1];
+
+    char oldWord[MAX_WORD_LENGTH];
+    char newWord[MAX_WORD_LENGTH];
+    printf("Enter the word to change: ");
+    scanf("%s", oldWord);
+    
+
+    char line[MAX_LINE_LENGTH];
+    char* token;
+    int currentLevel = 0;
+ int found = 0;
+    for (int i = 0; i < level->wordCount; i++) {
+        if (strcmp(level->words[i], oldWord) == 0) {
+            found = 1;
+            printf("Enter the new word: ");
+    scanf("%s", newWord);
+            // Change the word in the in-memory data structure
+            strcpy(level->words[i], newWord);
+            // Read the file line by line
+    while (fgets(line, MAX_LINE_LENGTH, inputFile) != NULL) {
+        // Check if the line contains "levelX:" (where X is the selected level)
+        if (strstr(line, "level") != NULL) {
+            currentLevel++;
+
+            // Check if it's the selected level
+            if (currentLevel == selectedLevel) {
+                // Tokenize the line to get individual words
+                token = strtok(line, ":[], \n");
+
+                // Write "levelX:" to the temporary file
+                fprintf(tempFile, "%s:[", token);
+
+                // Iterate through the tokens and write each word
+                while ((token = strtok(NULL, ":[], \n")) != NULL) {
+                    if (strcmp(token, oldWord) == 0) {
+                        // Replace the old word with the new word
+                        fprintf(tempFile, "%s,", newWord);
+                    } else {
+                        fprintf(tempFile, "%s,", token);
+                    }
+                }
+
+                // Check if there were words in the list
+                if (ftell(tempFile) > 0) {
+                    // Remove the trailing comma
+                    fseek(tempFile, -1, SEEK_CUR);
+                }
+
+                // Close the brackets
+                fprintf(tempFile, "]\n");
+            } else {
+                // If it's not the selected level, write it unchanged to the temporary file
+                fprintf(tempFile, "%s", line);
+            }
+        } else {
+            // If the line doesn't contain "levelX:", write it unchanged to the temporary file
+            fprintf(tempFile, "%s", line);
+        }
+    }
+            break;
+        }
+    }
+    
+
+   
+    if (!found) {
+        printf("Word not found in the selected level.\n");
+        fclose(inputFile);
+    fclose(tempFile);
+    remove("temp.txt");
+    } else {
+        printf("Word '%s' changed to '%s' in 'level%d'.\n", oldWord, newWord, selectedLevel);
+         // Close the files
+    fclose(inputFile);
+    fclose(tempFile);
+
+    // Rename the temporary file to the original file
+    remove(filename);
+    rename("temp.txt", filename);
+    }
+
+   
+    found =0;
+}*/
+/*void deleteWordAndUpdateFile(const char *filename,struct Level levels[], int levelCount) {
+    FILE *inputFile, *tempFile;
+    inputFile = fopen(filename, "r");
+    tempFile = fopen("temp.txt", "w+"); // Open a temporary file for reading and writing
+
+    if (inputFile == NULL || tempFile == NULL) {
+        perror("Error opening file");
+        exit(1);
+    }
+
+    int selectedLevel;
+
+    printf("Choose a level to delete a word from (1-3): ");
+    scanf("%d", &selectedLevel);
+
+    if (selectedLevel < 1 || selectedLevel > 3) {
+        printf("Invalid level number.\n");
+        exit(1);
+    }
+
+    char wordToDelete[MAX_WORD_LENGTH];
+    printf("Enter the word to delete from 'level%d': ", selectedLevel);
+    scanf("%s", wordToDelete);
+
+    char line[MAX_LINE_LENGTH];
+    char *token;
+    int currentLevel = 0;
+
+    // Read the file line by line
+    while (fgets(line, MAX_LINE_LENGTH, inputFile) != NULL) {
+        // Check if the line contains "levelX:" (where X is the selected level)
+        if (strstr(line, "level") != NULL) {
+            currentLevel++;
+
+            // Check if it's the selected level
+            if (currentLevel == selectedLevel) {
+                // Tokenize the line to get individual words
+                token = strtok(line, ":[], \n");
+
+                // Write "levelX:" to the temporary file
+                fprintf(tempFile, "%s:[", token);
+
+                // Iterate through the tokens and write each word
+                while ((token = strtok(NULL, ":[], \n")) != NULL) {
+                    // Skip the specified wordToDelete
+                    if (strcmp(token, wordToDelete) != 0) {
+                        fprintf(tempFile, "%s,", token);
+                    }
+                }
+
+                // Check if there were words in the list
+                if (ftell(tempFile) > 0) {
+                    // Remove the trailing comma
+                    fseek(tempFile, -1, SEEK_CUR);
+                    fprintf(tempFile, "]");
+                } else {
+                    // No words in the list, just close the brackets
+                    fprintf(tempFile, "[]");
+                }
+
+                fprintf(tempFile, "\n");
+            } else {
+                // If it's not the selected level, write it unchanged to the temporary file
+                fprintf(tempFile, "%s", line);
+            }
+        } else {
+            // If the line doesn't contain "levelX:", write it unchanged to the temporary file
+            fprintf(tempFile, "%s", line);
+        }
+    }
+    struct Level* level = &levels[selectedLevel - 1];
+     for (int i = 0; i < level->wordCount; ++i) {
+        if (strcmp(level->words[i], wordToDelete) == 0) {
+            // Found the word, now shift the remaining elements to the left
+            for (int j = i; j < level->wordCount - 1; ++j) {
+                strcpy(level->words[j], level->words[j + 1]);
+            }
+            // Decrement wordCount since we removed a word
+            level->wordCount--;
+            break;  // Exit the loop since we found and deleted the word
+        }
+    }
+
+    printf("Word '%s' deleted from 'level%d'.\n", wordToDelete, selectedLevel);
+
+    // Close the files
+    fclose(inputFile);
+    fclose(tempFile);
+
+    // Rename the temporary file to the original file
+    remove(filename);
+    rename("temp.txt", filename);
+}
+
+
+*/
 
 
 void deleteWordAndUpdateFile(const char *filename,struct Level levels[], int levelCount) {
@@ -296,8 +498,10 @@ void deleteWordAndUpdateFile(const char *filename,struct Level levels[], int lev
     struct Level* level = &levels[selectedLevel - 1];
      for (int i = 0; i < level->wordCount; ++i) {
         if (strcmp(level->words[i], wordToDelete) == 0) {
+            
             // Found the word, now shift the remaining elements to the left
-            for (int j = i; j < level->wordCount - 1; ++j) {
+            for (int j = i; j < level->wordCount; ++j) {
+                printf("word : %s\n",level->words[j]);
                 strcpy(level->words[j], level->words[j + 1]);
             }
             // Decrement wordCount since we removed a word
@@ -323,7 +527,7 @@ if (!found) {
     } 
 }
 
-void addWordAndUpdateFile(const char* filename, struct Level levels[], int levelCount) {
+/*void addWordAndUpdateFile(const char* filename, struct Level levels[], int levelCount) {
     FILE* inputFile, *tempFile;
     inputFile = fopen(filename, "r");
     tempFile = fopen("temp.txt", "w+");
@@ -400,6 +604,8 @@ printf("Enter the word to add to 'level%d': ", selectedLevel);
             // If the line doesn't contain "levelX:", write it unchanged to the temporary file
             fprintf(tempFile, "%s", line);
         }
+        // Close the files
+    
     }
 
     
@@ -413,6 +619,109 @@ printf("Enter the word to add to 'level%d': ", selectedLevel);
     rename("temp.txt", filename);
     } else {
         printf("Cannot add more words to 'level%d'. Maximum word count reached.\n", selectedLevel);
+        // Close the files
+    fclose(inputFile);
+    fclose(tempFile);
+
+    // Rename the temporary file to the original file
+   // remove(filename);
+    remove("temp.txt");
     }
+    
+}*/
+void addWordAndUpdateFile(const char* filename, struct Level levels[], int levelCount) {
+    FILE* inputFile, *tempFile;
+    inputFile = fopen(filename, "r");
+    tempFile = fopen("temp.txt", "w+");
+
+    if (inputFile == NULL || tempFile == NULL) {
+        perror("Error opening file");
+        exit(1);
+    }
+
+    int selectedLevel;
+
+    printf("Choose a level to add a word to (1-3): ");
+    scanf("%d", &selectedLevel);
+
+    if (selectedLevel < 1 || selectedLevel > 3) {
+        printf("Invalid level number.\n");
+        exit(1);
+    }
+struct Level* level = &levels[selectedLevel - 1];
+    if (level->wordCount < MAX_WORDS) {
+    char newWord[MAX_WORD_LENGTH];
+        int requiredLength = (selectedLevel == 1) ? 3 : (selectedLevel == 2) ? 6 : (selectedLevel == 3) ? 9 : 0;
+  do{
+printf("Enter the word to add to 'level%d': ", selectedLevel);
+    scanf("%s", &newWord);
+    if(strlen(newWord) != requiredLength) printf("\nthe length of the word should be %d",requiredLength);
+    }while(strlen(newWord) != requiredLength);
+
+    char line[MAX_LINE_LENGTH];
+    char* token;
+    int currentLevel = 0;
+
+    // Read the file line by line
+    while (fgets(line, MAX_LINE_LENGTH, inputFile) != NULL) {
+        // Check if the line contains "levelX:" (where X is the selected level)
+        if (strstr(line, "level") != NULL) {
+            currentLevel++;
+
+            // Check if it's the selected level
+            if (currentLevel == selectedLevel) {
+                // Tokenize the line to get individual words
+                token = strtok(line, ":[], \n");
+
+                // Write "levelX:" to the temporary file
+                fprintf(tempFile, "%s:[", token);
+
+                // Iterate through the tokens and write each word
+                int firstWord = 1;
+                while ((token = strtok(NULL, ":[], \n")) != NULL) {
+                    if (!firstWord) {
+                        fprintf(tempFile, ",");
+                    } else {
+                        firstWord = 0;
+                    }
+                    fprintf(tempFile, "%s", token);
+                }
+
+                // Write the new word to the temporary file
+                fprintf(tempFile, ",%s", newWord);
+
+                // Close the brackets
+                fprintf(tempFile, "]\n");
+            } else {
+                // If it's not the selected level, write it unchanged to the temporary file
+                fprintf(tempFile, "%s", line);
+            }
+        } else {
+            // If the line doesn't contain "levelX:", write it unchanged to the temporary file
+            fprintf(tempFile, "%s", line);
+        }
+    }
+     // Add the new word to the in-memory data structure
+        strcpy(level->words[level->wordCount], newWord);
+        level->wordCount++;
+        printf("Word '%s' added to 'level%d'.\n", newWord, selectedLevel);
+        // Close the files
+    fclose(inputFile);
+    fclose(tempFile);
+
+    // Rename the temporary file to the original file
+    remove(filename);
+    rename("temp.txt", filename);
+    }else {
+        printf("Cannot add more words to 'level%d'. Maximum word count reached.\n", selectedLevel);
+        fclose(inputFile);
+    fclose(tempFile);
+
+    
+    remove("temp.txt");
+    }
+
+    
+
     
 }
