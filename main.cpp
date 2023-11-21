@@ -79,13 +79,14 @@ int main() {
     char* formatedWord2;// array to store the colored word of player 2
     int *used_;// Array to track already matched characters
     int advance[2];// array to track 
+    int playerWin[2] ={0,0};// this variable will help us passs the player who didn't  quess the word first
     int adminExsit;
     int initialScore[2]={5,5};
     int playerScore[2]={0,0};
     int totalScore[2]={0,0};
     int hint[2];
   
-    //welcome screen
+    // welcome screen
     menuMain:;
     printf("   _____   _______________________ ___  _________\n");
     printf("  /     \\  \\_____  \\__    ___/    |   \\/   _____/\n");
@@ -372,7 +373,7 @@ int all_correct = 1; // Assume all elements are correct
             printf("playersore :%d  \n",playerScore[0]);
             
             if(w==wordCount-1 && playerScore[0]/19 <1){printf("game over ");printf("playerScore: %d",playerScore[0]); goto end;}
-            else if(w==wordCount-1 && playerScore[0]/19 >=1) {printf("Congratulations! passed level %d\n",k); totalScore[0]= playerScore[0];playerScore[0]=0;}
+            else if(w==wordCount-1 && playerScore[0]/19 >=1) {printf("Congratulations! passed level %d\n",k); /*totalScore[0]+= playerScore[0]playerScore[0]=0;*/}
             if(w==wordCount-1 && k==levelCount-1){
                 printf("Congratulations! you won. Your score is : %d\n",totalScore[0]);
             }
@@ -383,7 +384,14 @@ int all_correct = 1; // Assume all elements are correct
                 break;
             }
             if(initialScore[0] ==0){
-            printf("you didn't guess the word. Do you want to continue?\n");
+            printf("player 1 you didn't guess the word.\n");
+            playerWin[0]=0;
+            }
+            else{
+printf("Congratulations! player 1 you guessed the word.\n");
+playerWin[0]=1;
+            }
+            /*
             scanf("%d",&advance[0]);
             if(advance[0]==0)goto end;
             }else{printf("Congratulations! You guessed the word. Do you want to continue?\n");
@@ -396,7 +404,10 @@ int all_correct = 1; // Assume all elements are correct
             
             
             break;
+            */
         }
+          
+       
 int all_correct_ = 1; // Assume all elements are correct
         for (int i = 0; i < wordInfos[w].length; i++) {
             if (test_[i] != 1) {
@@ -410,18 +421,30 @@ int all_correct_ = 1; // Assume all elements are correct
                 
             }
         }
+   if((all_correct_==0) && (playerWin[0]==1)){
+           
+    playerWin[0]=0;
+    if(w==wordCount-1 && playerScore[1]/19 <1){printf("game over ");printf("player2 score: %d",playerScore[1]); goto end;}
 
+    printf("Do you want to continue?");
+
+            scanf("%d",&advance[1]);
+            if(advance[1]==0)goto end;
+            else break; 
+    
+
+}
         // Check if the win condition is met
         if (all_correct_) {
            
             playerScore[1]+=initialScore[1];
-            
+             printf("here");
             nextWord3:;
 
             printf("playersore :%d  \n",playerScore[1]);
             
             if(w==wordCount-1 && playerScore[1]/19 <1){printf("game over ");printf("player2 score: %d",playerScore[1]); goto end;}
-            else if(w==wordCount-1 && playerScore[1]/19 >=1) {printf("Congratulations player 2! you passed level %d\n",k); totalScore[1]= playerScore[1];playerScore[1]=0;}
+            else if(w==wordCount-1 && playerScore[1]/19 >=1) {printf("Congratulations player 2! you passed level %d\n",k); /*totalScore[1]= playerScore[1];playerScore[1]=0;*/}
             if(w==wordCount-1 && k==levelCount-1){
                 printf("Congratulations! player2 you won. Your score is : %d\n",totalScore[1]);
             }
@@ -431,12 +454,14 @@ int all_correct_ = 1; // Assume all elements are correct
                 printf("player2 score: %d",playerScore[1]);
                 break;
             }
+            printf("here");
             if(initialScore[1] ==0){
             printf("you didn't guess the word. Do you want to continue player 2 ?\n");
             //printf("playerScore: %d",playerScore);
             scanf("%d",&advance[1]);
             if(advance[1]==0)goto end;
-            }else{printf("Congratulations player 2! You guessed the word. Do you want to continue?\n");
+            }else{printf("Congratulations player 2! You guessed the word.\n");
+            printf("Do you want to continue?");
 
             scanf("%d",&advance[1]);
             if(advance[1]==0)goto end;}
@@ -447,6 +472,8 @@ int all_correct_ = 1; // Assume all elements are correct
             
             break;
         }
+        
+             
          }while (1);
          }
     }
@@ -456,12 +483,12 @@ int all_correct_ = 1; // Assume all elements are correct
         printf("Invalid role. Please choose 1 for player or 2 for super user.\n");
     }
     end:printf("THANK YOU FOR PLAYING");
-    printf("\nplayer1 score : %d, player2 score : %d",totalScore[0],totalScore[1]);
-    if(totalScore[0]==totalScore[1]){
+    printf("\nplayer1 score : %d, player2 score : %d",playerScore[0],playerScore[1]);
+    if(playerScore[0]==playerScore[1]){
         printf("It's a tie\n");
     
     }
-    else if(totalScore[0]>totalScore[1]){
+    else if(playerScore[0]>playerScore[1]){
         printf("Congratulations player 1! You won\n");
     
     }
